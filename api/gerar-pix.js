@@ -1,63 +1,40 @@
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Método não permitido' });
+  // 1. Valida o método de forma robusta (aceita POST em maiúsculo ou minúsculo)
+  const metodo = (req.method || '').toUpperCase();
+  if (metodo !== 'POST') {
+    return res.status(405).json({ error: `Método ${req.method} não permitido. Use POST.` });
   }
 
-  const { valor } = req.body;
-  const chave = process.env.NEXPAY_SECRET_KEY;
+  try {
+    const { valor } = req.body;
 
-  const urls = [
-    'https://nexpay.site/api/charge_create.php',
-    'https://www.nexpay.site/api/charge_create.php'
-  ];
+    // 2. Faz a chamada para a NexPay com o método POST explícito
+    const resposta = await fetch('https://www.nexpay.site/api/charge_create.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.NEXPAY_SECRET_KEY}`
+      },
+      body: JSON.stringify({ valor: valor })
+    });
 
-  const metodos = ['POST', 'GET'];
+    const texto = await resposta.text();
 
-  for (const url of urls) {
-    for (const metodo of metodos) {
-      try {
-        console.log(`Testando ${metodo} em ${url}`);
-        
-        const opcoes = {
-          method: metodo,
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${chave}`
-          }
-        };
-
-        // Se for POST, envia o corpo com o valor
-        if (metodo === 'POST') {
-          opcoes.body = JSON.stringify({ valor: valor });
-        }
-
-        const resposta = await fetch(url, opcoes);
-        const texto = await resposta.text();
-
-        console.log(`STATUS ${resposta.status} (${metodo} ${url})`);
-        console.log(`RESPOSTA: ${texto.substring(0, 200)}`);
-
-        // Se a resposta for JSON válido, retornamos imediatamente
-        if (texto.trim().startsWith('{')) {
-          try {
-            const dados = JSON.parse(texto);
-            if (resposta.ok) {
-              return res.status(200).json(dados);
-            }
-            // Se for JSON de erro, retornamos o erro específico
-            return res.status(resposta.status).json(dados);
-          } catch (e) {
-            // Ignora erro de parse e continua testando
-          }
-        }
-
-      } catch (erro) {
-        console.error(`Erro de rede em ${metodo} ${url}:`, erro.message);
-      }
+    // 3. Tenta converter a resposta para JSON
+    try {
+      const dados = JSON.parse(texto);
+      return res.status(resposta.status).json(dados);
+    } catch (erroParse) {
+      // Se a NexPay retornar HTML, mostra o status real e um trecho do erro
+      console.error('NexPay retornou HTML:', texto.substring(0, 300));
+      return res.status(500).json({
+        error: `NexPay retornou HTML (Status ${resposta.status}). Verifique a URL ou a chave.`,
+        detalhes: texto.substring(0, 200)
+      });
     }
-  }
 
-  return res.status(500).json({
-    error: 'Nenhuma combinação de URL e método retornou JSON válido. Verifique os logs da Vercel para ver os status exatos.'
-  });
-                              }
+  } catch (erro) {
+    console.error('Erro de rede:', erro);
+    return res.status(500).json({ error: erro.message });
+  }
+}
