@@ -581,7 +581,7 @@ function gerarPix() {
     const qrCodeImage = data.qr_code_base64 || data.qr_code_image || data.qr_code;
 
     if (qrCodeString) {
-      pixAtualId = data.id || data.txid || data.transaction_id; 
+      pixAtualId = data.txid || data.id || data.transaction_id; 
       document.getElementById('tela-pagamento-inicial').style.display = 'none';
       document.getElementById('tela-qrcode').style.display = 'block';
       
