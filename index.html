@@ -13,7 +13,7 @@
     --border-color: #27272a;
     --text-primary: #fafafa;
     --text-secondary: #a1a1aa;
-    --accent-color: #10b981; /* Verde Esmeralda */
+    --accent-color: #10b981;
     --accent-hover: #059669;
     --danger-color: #ef4444;
     --promo-color: #f59e0b;
@@ -39,7 +39,6 @@
   /* ===== HEADER ===== */
   header { position:sticky; top:0; z-index:100; background:rgba(9,9,11,0.8); backdrop-filter:blur(12px); border-bottom:1px solid var(--border-color); display:flex; align-items:center; justify-content:space-between; padding:16px 5%; }
   .logo { font-size:1.4rem; font-weight:800; letter-spacing:-0.5px; color:var(--text-primary); display: flex; align-items: center; gap: 8px;}
-  .logo svg { width: 28px; height: 28px; }
   .cart-btn { background:var(--surface-color); border:1px solid var(--border-color); padding:10px 16px; border-radius:8px; color:var(--text-primary); font-weight:600; cursor:pointer; display:flex; align-items:center; gap:8px; transition:0.2s; }
   .cart-btn:hover { background:var(--surface-hover); }
   #cart-count { background:var(--accent-color); color:#fff; border-radius:20px; padding:2px 8px; font-size:.75rem; font-weight:800; }
@@ -198,9 +197,7 @@
 </div>
 
 <header>
-  <div class="logo">
-    SMOKEZONE
-  </div>
+  <div class="logo">SMOKEZONE</div>
   <button class="cart-btn" onclick="openCart()">
     Carrinho <span id="cart-count">0</span>
   </button>
@@ -308,42 +305,34 @@ window.onload = function() {
   }
 };
 
-/* ============ CATÁLOGO (Nova Lógica de Preços) ============ */
+/* ============ CATÁLOGO ============ */
 const produtos = [
-   // ===== ELFBAR =====
   { id:1, marca:"elfbar", nome:"Elfbar BC10000", desc:"10.000 puffs • Melancia, Menta", precoBase:89.00, img:"https://elfbar.ae/cdn/shop/files/0618_1200x1200.png?v=1720427829" },
-  { id:2, marca:"elfbar", nome:"Elfbar BC15000", desc:"15.000 puffs • Morango, Blueberry", precoBase:89.99, img:"https://i.imgur.com/qF0aG8d.jpeg" },
+    { id:2, marca:"elfbar", nome:"Elfbar BC15000", desc:"15.000 puffs • Morango, Blueberry", precoBase:89.99, img:"img/elfbar-bc15000.jpg" },
   { id:3, marca:"elfbar", nome:"Elfbar EW9000", desc:"9.000 puffs (Refil/Kit) • Cool Mint", precoBase:85.41, img:"https://www.primevapehub.com/wp-content/uploads/2025/12/20251221_519017.webp" },
   { id:4, marca:"elfbar", nome:"Elfbar GH23000", desc:"23.000 puffs • Cotton Candy, Menta", precoBase:117.99, img:"https://vozolpuff.de/wp-content/uploads/2026/03/Watermelon-Ice-4.png" },
   { id:5, marca:"elfbar", nome:"Elfbar TE30000", desc:"30.000 puffs • Blue Razz Lemonade", precoBase:125.99, img:"https://mundovape.net/wp-content/uploads/2026/04/Elf-Bar-TE-30k-Pineapple-Mango.png" },
-  
-  // --- ITENS COM "LEVE 2 PAGUE 1" ---
-  { id:6, marca:"elfbar", nome:"Elfbar Duke 35K", desc:"35.000 puffs • Watermelon Ice", precoBase:133.99, img:"https://i.imgur.com/qF0aG8d.jpeg", promo2x1: true },
-  { id:7, marca:"elfbar", nome:"Elfbar Ice King 40K", desc:"40.000 puffs • Miami Mint", precoBase:140.06, img:"https://i.imgur.com/qF0aG8d.jpeg", promo2x1: true },
-  { id:8, marca:"elfbar", nome:"Elfbar Trio 40K", desc:"40.000 puffs • Strawberry Kiwi", precoBase:142.88, img:"https://i.imgur.com/qF0aG8d.jpeg", promo2x1: true },
-  { id:9, marca:"elfbar", nome:"Elfbar BC Pro 45K", desc:"45.000 puffs • Bubbaloo Uva", precoBase:142.88, img:"https://i.imgur.com/qF0aG8d.jpeg", promo2x1: true },
-  
-  // ===== IGNITE =====
-  { id:10, marca:"ignite", nome:"Ignite V500", desc:"50.000 puffs • Strawberry Ice", precoBase:162.00, img:"https://i.imgur.com/qF0aG8d.jpeg", promo2x1: true },
-  { id:11, marca:"ignite", nome:"Ignite V-MIX 40K", desc:"40.000 puffs • Dual Tank", precoBase:165.00, img:"https://i.imgur.com/qF0aG8d.jpeg", promo2x1: true },
-  { id:12, marca:"ignite", nome:"Ignite V155 Ultra Slim", desc:"15.500 puffs • Blueberry Ice", precoBase:124.08, img:"https://i.imgur.com/qF0aG8d.jpeg" },
-  { id:13, marca:"ignite", nome:"Ignite V55 Ultra Thin", desc:"5.500 puffs • Icy Mint", precoBase:94.00, img:"https://i.imgur.com/qF0aG8d.jpeg" },
-  { id:14, marca:"ignite", nome:"Ignite P100 Pro", desc:"10.000 puffs • Kit Touch Screen", precoBase:89.99, img:"https://i.imgur.com/qF0aG8d.jpeg" },
-  { id:15, marca:"ignite", nome:"Ignite V400 (40K)", desc:"40.000 puffs • Tela Digital", precoBase:158.00, img:"https://i.imgur.com/qF0aG8d.jpeg", promo2x1: true },
-  { id:16, marca:"ignite", nome:"Ignite V120", desc:"12.000 puffs • Grape Ice", precoBase:99.99, img:"https://i.imgur.com/qF0aG8d.jpeg" },
-  { id:17, marca:"ignite", nome:"Ignite V150", desc:"15.000 puffs • Watermelon Ice", precoBase:110.00, img:"https://i.imgur.com/qF0aG8d.jpeg" }
+  { id:6, marca:"elfbar", nome:"Elfbar Duke 35K", desc:"35.000 puffs • Watermelon Ice", precoBase:133.99, img:"img/elfbar-duke.jpg", promo2x1: true },
+  { id:7, marca:"elfbar", nome:"Elfbar Ice King 40K", desc:"40.000 puffs • Miami Mint", precoBase:140.06, img:"img/elfbar-iceking.jpg", promo2x1: true },
+  { id:8, marca:"elfbar", nome:"Elfbar Trio 40K", desc:"40.000 puffs • Strawberry Kiwi", precoBase:142.88, img:"img/elfbar-trio.jpg", promo2x1: true },
+  { id:9, marca:"elfbar", nome:"Elfbar BC Pro 45K", desc:"45.000 puffs • Bubbaloo Uva", precoBase:142.88, img:"img/elfbar-bcpro.jpg", promo2x1: true },
+  { id:10, marca:"ignite", nome:"Ignite V500", desc:"50.000 puffs • Strawberry Ice", precoBase:162.00, img:"img/ignite-v500.jpg", promo2x1: true },
+  { id:11, marca:"ignite", nome:"Ignite V-MIX 40K", desc:"40.000 puffs • Dual Tank", precoBase:165.00, img:"img/ignite-vmix.jpg", promo2x1: true },
+  { id:12, marca:"ignite", nome:"Ignite V155 Ultra Slim", desc:"15.500 puffs • Blueberry Ice", precoBase:124.08, img:"img/ignite-v155.jpg" },
+  { id:13, marca:"ignite", nome:"Ignite V55 Ultra Thin", desc:"5.500 puffs • Icy Mint", precoBase:94.00, img:"img/ignite-v55.jpg" },
+  { id:14, marca:"ignite", nome:"Ignite P100 Pro", desc:"10.000 puffs • Kit Touch Screen", precoBase:89.99, img:"img/ignite-p100.jpg" },
+  { id:15, marca:"ignite", nome:"Ignite V400 (40K)", desc:"40.000 puffs • Tela Digital", precoBase:158.00, img:"img/ignite-v400.jpg", promo2x1: true },
+  { id:16, marca:"ignite", nome:"Ignite V120", desc:"12.000 puffs • Grape Ice", precoBase:99.99, img:"img/ignite-v120.jpg" },
+  { id:17, marca:"ignite", nome:"Ignite V150", desc:"15.000 puffs • Watermelon Ice", precoBase:110.00, img:"img/ignite-v150.jpg" }
 ];
 
-// Função que calcula o preço final baseado nas regras
 function calcularPreco(produto) {
   let precoFinal = produto.precoBase;
   let temDesconto40 = false;
-  
   if (produto.precoBase > 90) {
     precoFinal = produto.precoBase * 0.6;
     temDesconto40 = true;
   }
-  
   return { precoFinal, temDesconto40 };
 }
 
@@ -367,16 +356,12 @@ function renderProdutos() {
       badgeHtml = `<span class="badge promo-2x1">Leve 2, Pague 1</span>`;
     } else {
       const { temDesconto40 } = calcularPreco(p);
-      if (temDesconto40) {
-        badgeHtml = `<span class="badge desconto">40% OFF</span>`;
-      }
+      if (temDesconto40) badgeHtml = `<span class="badge desconto">40% OFF</span>`;
     }
 
     const { precoFinal } = calcularPreco(p);
     let precoHtml = `${R$(precoFinal)}`;
-    if (precoFinal < p.precoBase) {
-      precoHtml += ` <small>${R$(p.precoBase)}</small>`;
-    }
+    if (precoFinal < p.precoBase) precoHtml += ` <small>${R$(p.precoBase)}</small>`;
 
     return `
     <div class="card">
@@ -414,7 +399,6 @@ function filterProducts(marca, el) {
 function addCarrinho(id) {
   const prod = produtos.find(p => p.id === id);
   const item = carrinho.find(i => i.id === id);
-  
   const { precoFinal } = calcularPreco(prod);
   const prodComPrecoCerto = { ...prod, precoFinal };
 
@@ -570,14 +554,20 @@ function gerarPix() {
     body: JSON.stringify({ valor: total })
   })
   .then(async res => {
-    if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}));
-      throw new Error(errorData.error || errorData.message || 'Erro interno no servidor. Verifique os logs na Vercel.');
+    const texto = await res.text();
+    try {
+      const dados = JSON.parse(texto);
+      if (!res.ok) throw new Error(dados.error || dados.message || 'Erro no servidor');
+      return dados;
+    } catch (e) {
+      if (!res.ok) {
+        throw new Error(`Servidor retornou erro HTML (Status ${res.status}). Verifique os logs na Vercel.`);
+      }
+      throw new Error('A resposta do servidor não é um JSON válido.');
     }
-    return res.json();
   })
   .then(data => {
-    const qrCodeString = data.qrcode || data.pix_copia_e_cola || data.qr_code;
+    const qrCodeString = data.qrcode || data.pix_copia_e_cola || data.qr_code || data.payload;
     const qrCodeImage = data.qr_code_base64 || data.qr_code_image || data.qr_code;
 
     if (qrCodeString) {
@@ -595,7 +585,7 @@ function gerarPix() {
       iniciarChecagem();
     } else {
       console.error("Resposta recebida:", data);
-      alert('Erro: A API não retornou o código PIX. Verifique os logs da Vercel.');
+      alert('Erro: A API não retornou o código PIX.');
       btn.innerText = "Gerar QR Code PIX";
       btn.disabled = false;
     }
@@ -614,7 +604,7 @@ function iniciarChecagem() {
     fetch(`/api/checar_pix?id=${pixAtualId}`)
       .then(res => res.json())
       .then(data => {
-        if (data.is_paid === true || data.status === 'PAID' || data.status === 'approved') {
+        if (data.is_paid === true || data.status === 'PAID' || data.status === 'approved' || data.status === 'pago') {
           clearInterval(intervaloChecagem);
           const status = document.getElementById('status-pagamento');
           status.style.color = '#10b981';
