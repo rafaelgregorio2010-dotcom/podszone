@@ -4,49 +4,60 @@ export default async function handler(req, res) {
   }
 
   const { valor } = req.body;
+  const chave = process.env.NEXPAY_SECRET_KEY;
 
-  // Vamos testar as duas variações de URL mais prováveis
-  const urlsParaTestar = [
+  const urls = [
     'https://nexpay.site/api/charge_create.php',
     'https://www.nexpay.site/api/charge_create.php'
   ];
 
-  for (const url of urlsParaTestar) {
-    try {
-      console.log(`Testando URL: ${url}`);
-      
-      const resposta = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.NEXPAY_SECRET_KEY}`
-        },
-        body: JSON.stringify({ valor: valor })
-      });
+  const metodos = ['POST', 'GET'];
 
-      const texto = await resposta.text();
-      
-      // Loga o status e os primeiros 300 caracteres da resposta
-      console.log(`STATUS ${resposta.status} para ${url}`);
-      console.log(`RESPOSTA: ${texto.substring(0, 300)}`);
+  for (const url of urls) {
+    for (const metodo of metodos) {
+      try {
+        console.log(`Testando ${metodo} em ${url}`);
+        
+        const opcoes = {
+          method: metodo,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${chave}`
+          }
+        };
 
-      // Se a resposta não for um erro de HTML, tentamos processar
-      if (texto.trim().startsWith('{')) {
-        const dados = JSON.parse(texto);
-        if (resposta.ok) {
-          return res.status(200).json(dados);
+        // Se for POST, envia o corpo com o valor
+        if (metodo === 'POST') {
+          opcoes.body = JSON.stringify({ valor: valor });
         }
-        // Se for JSON de erro, paramos e retornamos
-        return res.status(resposta.status).json(dados);
-      }
 
-    } catch (erro) {
-      console.error(`Erro de rede em ${url}:`, erro.message);
+        const resposta = await fetch(url, opcoes);
+        const texto = await resposta.text();
+
+        console.log(`STATUS ${resposta.status} (${metodo} ${url})`);
+        console.log(`RESPOSTA: ${texto.substring(0, 200)}`);
+
+        // Se a resposta for JSON válido, retornamos imediatamente
+        if (texto.trim().startsWith('{')) {
+          try {
+            const dados = JSON.parse(texto);
+            if (resposta.ok) {
+              return res.status(200).json(dados);
+            }
+            // Se for JSON de erro, retornamos o erro específico
+            return res.status(resposta.status).json(dados);
+          } catch (e) {
+            // Ignora erro de parse e continua testando
+          }
+        }
+
+      } catch (erro) {
+        console.error(`Erro de rede em ${metodo} ${url}:`, erro.message);
+      }
     }
   }
 
-  // Se todas as tentativas falharem
   return res.status(500).json({
-    error: 'NexPay retornou página de erro HTML em todas as URLs testadas. Verifique os logs da Vercel para ver o status exato.'
+    error: 'Nenhuma combinação de URL e método retornou JSON válido. Verifique os logs da Vercel para ver os status exatos.'
   });
-}
+                              }
