@@ -1,33 +1,34 @@
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Método não permitido' });
+    return res.status(405).json({ error: 'Método não permitido. Use GET.' });
   }
 
   try {
-    // Pega o txid que o frontend enviou
-    const { id } = req.query; 
-    const apiKey = process.env.NEXPAY_SECRET_KEY;
+    const { id } = req.query;
 
-    // URL correta para consultar o status
+    if (!id) {
+      return res.status(400).json({ error: 'O parâmetro id (txid) é obrigatório.' });
+    }
+
     const resposta = await fetch(`https://www.nexpay.site/api/charge_status.php?txid=${id}`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${apiKey}`
+        'Authorization': `Bearer ${process.env.NEXPAY_SECRET_KEY}`
       }
     });
 
-    const dados = await resposta.json();
-
-    if (!resposta.ok) {
-      return res.status(resposta.status).json({ 
-        error: dados.message || dados.error || 'Erro ao consultar status' 
+    const texto = await resposta.text();
+    
+    try {
+      const dados = JSON.parse(texto);
+      return res.status(resposta.status).json(dados);
+    } catch (erroParse) {
+      return res.status(500).json({
+        error: `Erro na NexPay (Status ${resposta.status})`,
+        detalhes: "A NexPay retornou HTML em vez de JSON."
       });
     }
-
-    return res.status(200).json(dados);
-
   } catch (erro) {
-    console.error('Erro na checagem:', erro);
     return res.status(500).json({ error: erro.message });
   }
 }
