@@ -1,34 +1,38 @@
 export default async function handler(req, res) {
-  // 1. Valida o método de forma robusta (aceita POST em maiúsculo ou minúsculo)
+  // 1. Valida o método de forma robusta
   const metodo = (req.method || '').toUpperCase();
   if (metodo !== 'POST') {
-    return res.status(405).json({ error: `Método ${req.method} não permitido. Use POST.` });
+    return res.status(405).json({ error: `Método ${req.method} não permitido.` });
   }
 
   try {
     const { valor } = req.body;
+    const chave = process.env.NEXPAY_SECRET_KEY;
 
-    // 2. Faz a chamada para a NexPay com o método POST explícito
+    // 2. Tenta a URL com POST e envia o valor como número
     const resposta = await fetch('https://www.nexpay.site/api/charge_create.php', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.NEXPAY_SECRET_KEY}`
+        'Authorization': `Bearer ${chave}`
       },
-      body: JSON.stringify({ valor: valor })
+      // A tentativa mais provável: enviar o valor como número e adicionar uma descrição
+      body: JSON.stringify({ 
+        valor: valor,
+        descricao: 'Pedido SmokeZone' // Tenta adicionar um campo comum em APIs de pagamento
+      })
     });
 
     const texto = await resposta.text();
 
-    // 3. Tenta converter a resposta para JSON
+    // 3. Tenta ler o JSON. Se falhar, mostra o erro exato da NexPay.
     try {
       const dados = JSON.parse(texto);
       return res.status(resposta.status).json(dados);
     } catch (erroParse) {
-      // Se a NexPay retornar HTML, mostra o status real e um trecho do erro
-      console.error('NexPay retornou HTML:', texto.substring(0, 300));
+      console.error('NexPay retornou HTML:', texto.substring(0, 500));
       return res.status(500).json({
-        error: `NexPay retornou HTML (Status ${resposta.status}). Verifique a URL ou a chave.`,
+        error: `NexPay retornou HTML (Status ${resposta.status}). Verifique os logs.`,
         detalhes: texto.substring(0, 200)
       });
     }
