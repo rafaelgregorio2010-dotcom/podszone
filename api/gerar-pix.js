@@ -1,29 +1,24 @@
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Método não permitido' });
-  }
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Método não permitido' });
 
   try {
-    // Pega os dados que o seu site enviou
-    const body = req.body;
-
-    // Faz a chamada para a NexPay
-    const respostaNexPay = await fetch('https://api.nexpay.site/v1/cobrancas', { // Confira a URL correta na documentação deles
+    const { valor } = req.body;
+    
+    // Tenta conectar com a NexPay
+    const resposta = await fetch('https://api.nexpay.site/v1/cobrancas', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.NEXPAY_SECRET_KEY}` // Puxa a chave secreta da Vercel
+        'Authorization': `Bearer ${process.env.NEXPAY_SECRET_KEY}`
       },
-      body: JSON.stringify(body)
+      body: JSON.stringify({ valor: valor })
     });
 
-    const dados = await respostaNexPay.json();
+    const dados = await resposta.json();
+    return res.status(resposta.status).json(dados);
 
-    // Devolve a resposta para o seu site
-    return res.status(respostaNexPay.status).json(dados);
-    
   } catch (erro) {
-    console.error(erro);
-    return res.status(500).json({ error: 'Erro interno ao gerar PIX' });
+    // Se der erro de conexão, isso vai aparecer no alerta do site
+    return res.status(500).json({ error: erro.message, detalhes: erro.cause });
   }
 }
