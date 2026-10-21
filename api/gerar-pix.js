@@ -1,39 +1,40 @@
 export default async function handler(req, res) {
-  // 1. Valida o método de forma robusta
-  const metodo = (req.method || '').toUpperCase();
-  if (metodo !== 'POST') {
-    return res.status(405).json({ error: `Método ${req.method} não permitido.` });
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Método não permitido. Use POST.' });
   }
 
   try {
     const { valor } = req.body;
-    const chave = process.env.NEXPAY_SECRET_KEY;
 
-    // 2. Tenta a URL com POST e envia o valor como número
+    // A DOCUMENTAÇÃO EXIGE O VALOR COMO STRING COM 2 CASAS DECIMAIS (ex: "20.00")
+    const valorFormatado = Number(valor).toFixed(2);
+
     const resposta = await fetch('https://www.nexpay.site/api/charge_create.php', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${chave}`
+        'Authorization': `Bearer ${process.env.NEXPAY_SECRET_KEY}`
       },
-      // A tentativa mais provável: enviar o valor como número e adicionar uma descrição
-      body: JSON.stringify({ 
-        valor: valor,
-        descricao: 'Pedido SmokeZone' // Tenta adicionar um campo comum em APIs de pagamento
-      })
+      body: JSON.stringify({ valor: valorFormatado })
     });
 
     const texto = await resposta.text();
 
-    // 3. Tenta ler o JSON. Se falhar, mostra o erro exato da NexPay.
     try {
       const dados = JSON.parse(texto);
-      return res.status(resposta.status).json(dados);
+      
+      // Se a NexPay retornar um erro (ex: chave inválida), repassa para o site
+      if (!resposta.ok) {
+        return res.status(resposta.status).json(dados);
+      }
+      
+      return res.status(200).json(dados);
     } catch (erroParse) {
-      console.error('NexPay retornou HTML:', texto.substring(0, 500));
+      // Se retornar HTML, mostra o erro nos logs
+      console.error('NexPay retornou HTML:', texto.substring(0, 300));
       return res.status(500).json({
-        error: `NexPay retornou HTML (Status ${resposta.status}). Verifique os logs.`,
-        detalhes: texto.substring(0, 200)
+        error: `NexPay retornou HTML (Status ${resposta.status}).`,
+        detalhes: 'Verifique a URL ou a chave de API.'
       });
     }
 
